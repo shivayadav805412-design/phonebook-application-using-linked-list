@@ -1,0 +1,173 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+// Structure for storing contact details
+struct Contact {
+    char name[50];
+    char phone[20];
+    char email[50];
+    struct Contact *next;
+};
+
+// Function prototypes
+void addContact(struct Contact **head);
+void displayContacts(struct Contact *head);
+void searchContact(struct Contact *head);
+void deleteContact(struct Contact **head);
+void updateContact(struct Contact *head);
+
+// Main function
+int main() {
+    struct Contact *head = NULL;
+    int choice;
+
+    while (1) {
+        printf("\n===== PHONEBOOK MENU =====\n");
+        printf("1. Add Contact\n");
+        printf("2. Display All Contacts\n");
+        printf("3. Search Contact\n");
+        printf("4. Delete Contact\n");
+        printf("5. Update Contact\n");
+        printf("6. Exit\n");
+        printf("===========================\n");
+        printf("Enter your choice: ");
+        scanf("%d", &choice);
+        getchar(); // clear input buffer
+
+        switch (choice) {
+            case 1:
+                addContact(&head);
+                break;
+            case 2:
+                displayContacts(head);
+                break;
+            case 3:
+                searchContact(head);
+                break;
+            case 4:
+                deleteContact(&head);
+                break;
+            case 5:
+                updateContact(head);
+                break;
+            case 6:
+                printf("Exiting Phonebook...\n");
+                exit(0);
+            default:
+                printf("Invalid choice! Please try again.\n");
+        }
+    }
+    return 0;
+}
+
+// Function to add a new contact
+void addContact(struct Contact **head) {
+    struct Contact *newContact = (struct Contact *)malloc(sizeof(struct Contact));
+    printf("Enter name: ");
+    fgets(newContact->name, sizeof(newContact->name), stdin);
+    newContact->name[strcspn(newContact->name, "\n")] = 0;
+
+    printf("Enter phone number: ");
+    fgets(newContact->phone, sizeof(newContact->phone), stdin);
+    newContact->phone[strcspn(newContact->phone, "\n")] = 0;
+
+    printf("Enter email: ");
+    fgets(newContact->email, sizeof(newContact->email), stdin);
+    newContact->email[strcspn(newContact->email, "\n")] = 0;
+
+    newContact->next = *head;
+    *head = newContact;
+
+    printf("Contact added successfully!\n");
+}
+
+// Function to display all contacts
+void displayContacts(struct Contact *head) {
+    if (head == NULL) {
+        printf("No contacts found!\n");
+        return;
+    }
+
+    printf("\n----- Contact List -----\n");
+    while (head != NULL) {
+        printf("Name: %s\n", head->name);
+        printf("Phone: %s\n", head->phone);
+        printf("Email: %s\n", head->email);
+        printf("-------------------------\n");
+        head = head->next;
+    }
+}
+
+// Function to search for a contact
+void searchContact(struct Contact *head) {
+    char name[50];
+    printf("Enter name to search: ");
+    fgets(name, sizeof(name), stdin);
+    name[strcspn(name, "\n")] = 0;
+
+    while (head != NULL) {
+        if (strcmp(head->name, name) == 0) {
+            printf("\nContact Found:\n");
+            printf("Name: %s\n", head->name);
+            printf("Phone: %s\n", head->phone);
+            printf("Email: %s\n", head->email);
+            return;
+        }
+        head = head->next;
+    }
+    printf("Contact not found!\n");
+}
+
+// Function to delete a contact
+void deleteContact(struct Contact **head) {
+    char name[50];
+    printf("Enter name to delete: ");
+    fgets(name, sizeof(name), stdin);
+    name[strcspn(name, "\n")] = 0;
+
+    struct Contact *temp = *head, *prev = NULL;
+
+    while (temp != NULL && strcmp(temp->name, name) != 0) {
+        prev = temp;
+        temp = temp->next;
+    }
+
+    if (temp == NULL) {
+        printf("Contact not found!\n");
+        return;
+    }
+
+    if (prev == NULL)
+        *head = temp->next;
+    else
+        prev->next = temp->next;
+
+    free(temp);
+    printf("Contact deleted successfully!\n");
+}
+
+// Function to update a contact
+void updateContact(struct Contact *head) {
+    char name[50];
+    printf("Enter name to update: ");
+    fgets(name, sizeof(name), stdin);
+    name[strcspn(name, "\n")] = 0;
+
+    while (head != NULL) {
+        if (strcmp(head->name, name) == 0) {
+            printf("Enter new phone number: ");
+            fgets(head->phone, sizeof(head->phone), stdin);
+            head->phone[strcspn(head->phone, "\n")] = 0;
+
+            printf("Enter new email: ");
+            fgets(head->email, sizeof(head->email), stdin);
+            head->email[strcspn(head->email, "\n")] = 0;
+
+            printf("Contact updated successfully!\n");
+            return;
+        }
+        head = head->next;
+    }
+    printf("Contact not found!\n");
+}
